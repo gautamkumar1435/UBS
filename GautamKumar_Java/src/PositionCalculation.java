@@ -31,7 +31,7 @@ public class PositionCalculation {
 	public void calculationEngine() {
 
 		JSONArray inputTransaction = readJsonData("inputFiles/1537277231233_Input_Transactions.txt");
-		JSONArray openingData = readCsvData("inputFiles/Input_StartOfDay_Positions.txt");
+		JSONArray openingData = readCsvData("inputFiles/Input_StartOfDay_Positions.txt", false);
 		
 		Map<String, Map> closingData = new HashMap<String, Map>();
 		openingData.forEach(opening -> {
@@ -63,6 +63,9 @@ public class PositionCalculation {
 			closingData.get(transactionDataJson.get(instrument).toString().concat("_E")).put(quantity, e);
 			closingData.get(transactionDataJson.get(instrument).toString().concat("_I")).put(quantity, i);
 		});
+		System.out.println("Expected End of the Day Position:-");
+		JSONArray expectedData = readCsvData("inputFiles/Expected_EndOfDay_Positions.txt", true);
+		System.out.println("\n\nCalculated End of the Day Position:-");
 		Iterator<String> iteratorClosingData = closingData.keySet().iterator();
 		iteratorClosingData.forEachRemaining(closing ->{
 			Map currentRow = closingData.get(closing);
@@ -90,7 +93,7 @@ public class PositionCalculation {
 		return result;
 	}
 
-	public JSONArray readCsvData(String _filePath) {
+	public JSONArray readCsvData(String _filePath, boolean _isPrint) {
 		BufferedReader br = null;
 		String line = "";
 		String cvsSplitBy = ",";
@@ -99,6 +102,8 @@ public class PositionCalculation {
 		try {
 			br = new BufferedReader(new FileReader(_filePath));
 			while ((line = br.readLine()) != null) {
+				if(_isPrint)
+					System.out.println(line);
 				String[] lineData = line.split(cvsSplitBy);
 				if (headers != null) {
 					JSONObject rowData = new JSONObject();
@@ -128,18 +133,7 @@ public class PositionCalculation {
 	}
 
 	public static void main(String[] args) {
-		System.out.println("======== START =======");
-		/*
-		 * String filePath = "inputFiles/Expected_EndOfDay_Positions.txt"; String
-		 * jsonFilePath = "inputFiles/1537277231233_Input_Transactions.txt";
-		 * PositionCalculation ps = new PositionCalculation(); JSONArray csvData =
-		 * ps.readCsvData(filePath); JSONArray jsonData = ps.readJsonData(jsonFilePath);
-		 * System.out.println(csvData); System.out.println(jsonData);
-		 */
-
 		PositionCalculation ps = new PositionCalculation();
 		ps.calculationEngine();
-
-		System.out.println("======== END =======");
 	}
 }
